@@ -1,0 +1,11 @@
+quarkus:
+  log:
+    console:
+      level: INFO
+      format: '%d{yyyy-MM-dd''T''HH:mm:ss} component=transaction type=%p message="%s" class=%C thread="%t" exception="%e"%n'
+  test:
+    continuous-testing: disabled
+  http:
+    port: 8084
+    host: 0.0.0.0
+    test-port: 0
