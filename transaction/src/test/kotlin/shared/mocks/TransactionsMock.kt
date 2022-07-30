@@ -1,9 +1,12 @@
 package shared.mocks
 
 import domain.boundaries.Transactions
-import domain.events.TransactionEvent
 import domain.events.TransactionRequested
+import io.quarkus.test.Mock
+import javax.inject.Singleton
 
+@Mock
+@Singleton
 class TransactionsMock : Transactions {
 
     val list = mutableListOf<TransactionRequested>()

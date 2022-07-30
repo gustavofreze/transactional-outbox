@@ -1,6 +1,6 @@
 package shared.commonvalues
 
-import java.util.*
+import java.util.Currency
 import java.util.Currency.getInstance
 
 object Currencies {

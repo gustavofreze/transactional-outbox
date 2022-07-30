@@ -1,11 +1,11 @@
 package shared
 
+import com.mysql.cj.jdbc.MysqlDataSource
 import org.flywaydb.core.Flyway
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.utility.DockerImageName
-import com.mysql.cj.jdbc.MysqlDataSource
 
 object MySQL {
 

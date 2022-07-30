@@ -17,15 +17,15 @@ class CountryTest {
         "USD"
     )
     @ParameterizedTest
-    fun `Exception where ISO 3166-1-alpha-2 code is invalid`(iso2: String) {
+    fun `Exception where ISO 3166-1-alpha-2 code is invalid`(alpha2: String) {
         val exception = assertThrows<IllegalStateException> {
-            Country(iso2 = iso2)
+            Country(alpha2 = alpha2)
         }
 
         val template = "The country's ISO 3166-1-alpha-2 <%s> code is invalid."
 
         expectThat(exception.message)
             .isNotNull()
-            .isEqualTo(template.format(iso2))
+            .isEqualTo(template.format(alpha2))
     }
 }

@@ -8,8 +8,7 @@ import java.math.RoundingMode
 
 object Amounts {
 
-    fun randomAmount() = Amount(
-        positive = Positive(value = BigDecimal(Math.random().plus(1)).setScale(2, RoundingMode.HALF_UP)),
-        currency = randomCurrency()
-    )
+    fun randomAmount(): Amount = Amount(positive = Positive(value = randomValue()), currency = randomCurrency())
+
+    fun randomValue(): BigDecimal = BigDecimal(Math.random().plus(1)).setScale(2, RoundingMode.HALF_UP)
 }

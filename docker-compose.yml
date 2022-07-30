@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  checkout-adm:
+    image: mysql:8.0.29
+    restart: always
+    hostname: checkout-adm
+    container_name: checkout-adm
+    ports:
+      - "3307:3307"
+    environment:
+      TZ: "America/Sao_Paulo"
+      MYSQL_ROOT_PASSWORD: "root"
+    volumes:
+      - ./checkout/mysql/config:/scripts/config
+      - ./checkout/mysql/use-case:/scripts/use-case
+      - ./checkout/mysql/migration:/scripts/migration
+      - ./checkout/mysql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  transaction:
+    build:
+      context: transaction
+      dockerfile: Dockerfile
+    restart: always
+    hostname: transaction
+    container_name: transaction
+    ports:
+      - "8084:8084"
+    env_file:
+      - transaction/config/configs.env
+    depends_on:
+      - kafka
+      - transaction-adm
+
+  transaction-adm:
+    image: mysql:8.0.29
+    restart: always
+    hostname: transaction-adm
+    container_name: transaction-adm
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: "America/Sao_Paulo"
+      MYSQL_ROOT_PASSWORD: "root"
+    volumes:
+      - ./transaction/src/main/resources/db/mysql/config:/scripts/config
+      - ./transaction/src/main/resources/db/mysql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh

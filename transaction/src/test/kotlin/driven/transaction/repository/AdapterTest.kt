@@ -3,6 +3,7 @@ package driven.transaction.repository
 import com.jayway.jsonpath.JsonPath.parse
 import domain.boundaries.Transactions
 import domain.events.TransactionEvent
+import domain.events.TransactionRequested
 import domain.models.Amount
 import domain.models.Country
 import domain.models.Positive
@@ -12,24 +13,33 @@ import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.withHandleUnchecked
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
-import shared.Events.TRANSACTION_REQUESTED
 import shared.MySQL
+import shared.commonvalues.Amounts.randomAmount
+import shared.commonvalues.Countries.randomAlphaCode
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.math.BigDecimal
+import java.time.Instant.now
 import java.util.Currency.getInstance
 import java.util.UUID
 
+@Suppress("SqlResolve")
 @Tag("IntegrationTest")
 class AdapterTest {
 
     private val jdbi: Jdbi = MySQL.jdbi
     private val transactions: Transactions = Adapter(jdbi = jdbi)
+    private val transactionRequested = TransactionRequested(
+        amount = randomAmount(),
+        country = Country(alpha2 = randomAlphaCode()),
+        occurredOn = now(),
+        transactionId = TransactionId()
+    )
 
     @Test
     fun `Transaction request`() {
         /** @Dado que uma transação foi solicitada */
-        val event = TRANSACTION_REQUESTED
+        val event = transactionRequested
 
         /** @Quando a persistência dessa solicitação transação for efetuada */
         transactions.save(event = event)
@@ -40,7 +50,7 @@ class AdapterTest {
         /** @E ela deverá manter as informações contidas no evento */
         expectThat(transaction).and {
             get { id }.isEqualTo(event.transactionId)
-            get { country.iso2 }.isEqualTo(event.country.iso2)
+            get { country.alpha2 }.isEqualTo(event.country.alpha2)
             get { amount.currency }.isEqualTo(event.amount.currency)
             get { amount.positive.value.setScale(2) }.isEqualTo(event.amount.positive.value)
         }
@@ -61,7 +71,7 @@ class AdapterTest {
             get { read<Int>("$.size()") }.isEqualTo(4)
             get { read<Int>("$.country.size()") }.isEqualTo(1)
             get { read<Int>("$.amount.size()") }.isEqualTo(2)
-            get { read<String>("$.country.iso2") }.isEqualTo(event.country.iso2)
+            get { read<String>("$.country.alpha2") }.isEqualTo(event.country.alpha2)
             get { read<String>("$.amount.value") }.isEqualTo(event.amount.positive.value.toString())
             get { read<String>("$.amount.currency") }.isEqualTo(event.amount.currency.currencyCode)
         }
@@ -74,10 +84,10 @@ class AdapterTest {
                     BIN_TO_UUID(id) AS id, 
                     value, 
                     currency, 
-                    country_iso_2 AS countryIso2 
+                    country_alpha2 AS countryAlpha2 
                 FROM transaction 
                 WHERE id = UUID_TO_BIN(:id)
-            """.trimIndent()
+        """.trimIndent()
 
         return@withHandleUnchecked handle
             .createQuery(query)
@@ -99,7 +109,7 @@ class AdapterTest {
                     aggregate_type AS aggregateType
                 FROM outbox_event 
                 WHERE aggregate_id = :id AND event_type = :eventType
-            """.trimIndent()
+        """.trimIndent()
 
         return@withHandleUnchecked handle
             .createQuery(query)
@@ -114,13 +124,13 @@ class AdapterTest {
         val id: UUID,
         val value: BigDecimal,
         val currency: String,
-        val countryIso2: String
+        val countryAlpha2: String
     ) {
 
         fun toTransaction() = Transaction(
             id = TransactionId(value = id),
             amount = Amount(positive = Positive(value = value), currency = getInstance(currency)),
-            country = Country(iso2 = countryIso2)
+            country = Country(alpha2 = countryAlpha2)
         )
     }
 

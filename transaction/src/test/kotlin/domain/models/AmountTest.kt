@@ -8,7 +8,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotNull
 import java.math.BigDecimal
-import java.util.*
+import java.util.Currency
 
 @Tag("UnitTest")
 class AmountTest {

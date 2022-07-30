@@ -14,7 +14,7 @@ class TransactionRequested(event: TransactionRequested) : TransactionEvent(event
             "currency" to event.amount.currency.toString()
         }
         "country" to obj {
-            "iso2" to event.country.iso2
+            "alpha2" to event.country.alpha2
         }
         "occurredOn" to event.occurredOn.toString()
     }.toString()
