@@ -1,0 +1,12 @@
+{
+  "title": "CheckoutEvent",
+  "description": "Checkout schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "aggregateId": {
+      "type": "string",
+      "description": "Identificador de checkout."
+    }
+  }
+}

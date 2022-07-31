@@ -1,6 +1,6 @@
 package driver.kafka
 
-import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+import driver.kafka.outbox.OutboxSerde
 import org.apache.kafka.common.serialization.Serdes.String
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
@@ -14,10 +14,9 @@ class TopologyFactory {
     @Produces
     fun build(settings: Settings, consumer: Consumer<*>): Topology {
         val builder = StreamsBuilder()
-        val valueSerde = GenericAvroSerde().also { it.configure(settings.toMap(), false) }
 
         builder
-            .stream(consumer.topic, with(String(), valueSerde))
+            .stream(consumer.topic, with(String(), OutboxSerde.build()))
             .foreach { _, value -> consumer.accept(record = value) }
 
         return builder.build()

@@ -10,8 +10,8 @@ import java.util.UUID.randomUUID
 
 abstract class TransactionEvent(event: TransactionEvent) : Event {
 
-    override val occurredOn: LocalDateTime = now()
     final override val id: UUID = randomUUID()
+    final override val occurredOn: LocalDateTime = now()
     final override val aggregateId: String = event.transactionId.value.toString()
     final override val aggregateType: String = "Transaction"
 

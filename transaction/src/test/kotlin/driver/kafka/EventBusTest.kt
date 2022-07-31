@@ -1,10 +1,9 @@
 package driver.kafka
 
 import driver.kafka.checkout.CheckoutEventBus
+import driver.kafka.checkout.factories.dtos.Amount
+import driver.kafka.checkout.factories.dtos.Country
 import driver.kafka.checkout.factories.events.CheckoutDone
-import driver.kafka.checkout.factories.models.Amount
-import driver.kafka.checkout.factories.models.CheckoutId
-import driver.kafka.checkout.factories.models.Country
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -15,12 +14,13 @@ import shared.commonvalues.Amounts.randomValue
 import shared.commonvalues.Countries.randomAlphaCode
 import shared.commonvalues.Currencies.randomCurrency
 import shared.mocks.InstanceMock
+import java.util.UUID.randomUUID
 
 @Tag("UnitTest")
 class EventBusTest {
 
     private val event = CheckoutDone(
-        id = CheckoutId(),
+        id = randomUUID().toString(),
         amount = Amount(value = randomValue(), currency = randomCurrency()),
         country = Country(alpha2 = randomAlphaCode())
     )
@@ -61,13 +61,13 @@ class EventBusTest {
     @Test
     fun `No exceptions when no interested policies`() {
         /** @Dado que não há políticas interessadas no evento */
-        val eventBus = CheckoutEventBus(policies = InstanceMock(mutableListOf()))
+        val eventBus = CheckoutEventBus(policies = InstanceMock(list = mutableListOf()))
 
         /** @Então nenhuma exceção deve ser lançada */
         assertDoesNotThrow {
+
             /** @Quando o evento é despachado para o barramento */
-            /** @Quando o evento é despachado para o barramento */
-            eventBus.dispatch(event)
+            eventBus.dispatch(event = event)
         }
     }
 }

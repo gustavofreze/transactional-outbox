@@ -4,17 +4,19 @@ import driver.kafka.Consumer
 import driver.kafka.EventBus
 import driver.kafka.checkout.factories.EventFactory
 import driver.kafka.checkout.factories.events.CheckoutEvent
-import org.apache.avro.generic.GenericRecord
+import driver.kafka.outbox.Outbox
 import javax.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class CheckoutConsumer(private val eventBus: EventBus<CheckoutEvent>) : Consumer<CheckoutEvent> {
+class CheckoutConsumer(
+    private val eventBus: EventBus<CheckoutEvent>,
+    private val eventFactory: EventFactory
+) : Consumer<CheckoutEvent> {
 
     override val topic: String = "payin.checkout"
 
-    override fun accept(record: GenericRecord) {
-        val factory = EventFactory.map(record = record)
-        val event = factory.build()
+    override fun accept(record: Outbox) {
+        val event = eventFactory.map(record = record)
 
         eventBus.dispatch(event = event)
     }

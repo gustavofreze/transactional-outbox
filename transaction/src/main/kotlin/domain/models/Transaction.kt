@@ -1,7 +1,7 @@
 package domain.models
 
 import domain.events.TransactionRequested
-import java.time.Instant.now
+import java.time.LocalDateTime.now
 
 data class Transaction(val id: TransactionId = TransactionId(), val amount: Amount, val country: Country) {
 

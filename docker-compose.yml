@@ -7,7 +7,7 @@ services:
     hostname: checkout-adm
     container_name: checkout-adm
     ports:
-      - "3307:3307"
+      - "3307:3306"
     environment:
       TZ: "America/Sao_Paulo"
       MYSQL_ROOT_PASSWORD: "root"
@@ -16,6 +16,20 @@ services:
       - ./checkout/mysql/use-case:/scripts/use-case
       - ./checkout/mysql/migration:/scripts/migration
       - ./checkout/mysql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  transaction-adm:
+    image: mysql:8.0.29
+    restart: always
+    hostname: transaction-adm
+    container_name: transaction-adm
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: "America/Sao_Paulo"
+      MYSQL_ROOT_PASSWORD: "root"
+    volumes:
+      - ./transaction/src/main/resources/db/mysql/config:/scripts/config
+      - ./transaction/src/main/resources/db/mysql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
 
   transaction:
     build:
@@ -31,17 +45,111 @@ services:
     depends_on:
       - kafka
       - transaction-adm
-
-  transaction-adm:
-    image: mysql:8.0.29
-    restart: always
-    hostname: transaction-adm
-    container_name: transaction-adm
-    ports:
-      - "3306:3306"
-    environment:
-      TZ: "America/Sao_Paulo"
-      MYSQL_ROOT_PASSWORD: "root"
     volumes:
-      - ./transaction/src/main/resources/db/mysql/config:/scripts/config
-      - ./transaction/src/main/resources/db/mysql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./transaction/src/main/resources/kafka/schemas:/opt/application/kafka/schemas
+      - ./transaction/src/main/resources/kafka/connectors:/opt/application/kafka/connectors
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    restart: always
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    restart: always
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_JMX_PORT: 9021
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: 1
+      KAFKA_JMX_HOSTNAME: "localhost"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONFLUENT_METRICS_ENABLE: "true"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT_HOST://localhost:29092,PLAINTEXT://kafka:9092"
+      CONFLUENT_SUPPORT_CUSTOMER_ID: "anonymous"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka:29092"
+    depends_on:
+      - zookeeper
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.1
+    restart: always
+    hostname: schema-registry
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka:9092,zookeeper:2181"
+    depends_on:
+      - kafka
+      - zookeeper
+
+  kafka-connect:
+    image: debezium/connect:1.9
+    restart: always
+    hostname: kafka-connect
+    container_name: kafka-connect
+    ports:
+      - "8083:8083"
+    environment:
+      GROUP_ID: 1
+      HEAP_OPTS: "-Xmx256m"
+      BOOTSTRAP_SERVERS: "kafka:9092"
+      SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONFIG_STORAGE_TOPIC: "kafka.connect.config"
+      OFFSET_STORAGE_TOPIC: "kafka.connect.offsets"
+      STATUS_STORAGE_TOPIC: "kafka.connect.status"
+      INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+    depends_on:
+      - kafka
+      - schema-registry
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.2.1
+    restart: always
+    hostname: control-center
+    container_name: control-center
+    ports:
+      - "9021:9021"
+    environment:
+      PORT: 9021
+      CONTROL_CENTER_CONNECT_CLUSTER: "http://kafka-connect:8083"
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:9092,localhost:29092"
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_LOG4J_ROOT_LOGLEVEL: "ERROR"
+      CONTROL_CENTER_TOOLS_LOG4J_LOGLEVEL: "ERROR"
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+    depends_on:
+      - kafka
+      - zookeeper
+      - kafka-connect
+      - schema-registry
+    links:
+      - kafka
+      - zookeeper
+      - kafka-connect
+      - schema-registry

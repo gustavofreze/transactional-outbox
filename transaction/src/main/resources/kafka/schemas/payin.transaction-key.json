@@ -1,0 +1,12 @@
+{
+  "title": "TransactionEvent",
+  "description": "Transaction schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "aggregateId": {
+      "type": "string",
+      "description": "Identificador da transação."
+    }
+  }
+}

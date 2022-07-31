@@ -1,14 +1,14 @@
 package shared
 
-import io.confluent.kafka.schemaregistry.avro.AvroSchema
+import io.confluent.kafka.schemaregistry.json.JsonSchema
 
 object Schema {
 
-    fun load(name: String): AvroSchema {
-        val schemaResource = this::class.java.getResourceAsStream("/schemas/$name.avsc")
-            ?: error("Schema not found: /schemas/$name.avsc")
-        val schemaString = schemaResource.bufferedReader().use { it.readText() }
+    fun load(name: String): JsonSchema {
+        val path = "/kafka/schemas/$name.json"
+        val resource = this::class.java.getResourceAsStream(path) ?: error("Schema not found: $path")
+        val schemaString = resource.bufferedReader().use { it.readText() }
 
-        return AvroSchema(schemaString)
+        return JsonSchema(schemaString)
     }
 }

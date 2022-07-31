@@ -1,10 +1,10 @@
 package driver.kafka
 
-import org.apache.avro.generic.GenericRecord
+import driver.kafka.outbox.Outbox
 
 interface Consumer<T : Event> {
 
     val topic: String
 
-    fun accept(record: GenericRecord)
+    fun accept(record: Outbox)
 }

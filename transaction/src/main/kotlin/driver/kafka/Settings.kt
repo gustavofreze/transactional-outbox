@@ -14,13 +14,6 @@ data class Settings(
     val schemaRegistryUrl: String = get("SCHEMA_REGISTRY_URL")
 ) {
 
-    fun toMap(): Map<String, Any> {
-        val map: MutableMap<String, Any> = mutableMapOf()
-        toProperties().forEach { map[it.key.toString()] = it.value }
-
-        return map
-    }
-
     fun toProperties(): Properties {
         val properties = Properties()
         properties[APPLICATION_ID_CONFIG] = applicationId

@@ -19,11 +19,11 @@ import shared.commonvalues.Countries.randomAlphaCode
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.math.BigDecimal
-import java.time.Instant.now
+import java.time.LocalDateTime.now
 import java.util.Currency.getInstance
 import java.util.UUID
 
-@Suppress("SqlResolve")
+@Suppress("SqlResolve", "SqlNoDataSourceInspection")
 @Tag("IntegrationTest")
 class AdapterTest {
 
@@ -77,16 +77,14 @@ class AdapterTest {
         }
     }
 
-    @Suppress("SqlDialectInspection", "SqlNoDataSourceInspection")
     private fun transactionOf(transactionId: TransactionId): Transaction = jdbi.withHandleUnchecked { handle ->
         val query = """
-                SELECT 
-                    BIN_TO_UUID(id) AS id, 
-                    value, 
-                    currency, 
-                    country_alpha2 AS countryAlpha2 
-                FROM transaction 
-                WHERE id = UUID_TO_BIN(:id)
+            SELECT BIN_TO_UUID(id) AS id,
+                   value,
+                   currency,
+                   country_alpha2  AS countryAlpha2
+            FROM transaction
+            WHERE id = UUID_TO_BIN(:id);
         """.trimIndent()
 
         return@withHandleUnchecked handle
@@ -98,17 +96,16 @@ class AdapterTest {
             .toTransaction()
     }
 
-    @Suppress("SqlDialectInspection", "SqlNoDataSourceInspection")
     private fun outboxEventOf(event: TransactionEvent) = jdbi.withHandleUnchecked { handle ->
         val query = """
-                SELECT 
-                    payload,             
-                    revision,             
-                    event_type AS eventType,             
-                    aggregate_id AS aggregateId,             
-                    aggregate_type AS aggregateType
-                FROM outbox_event 
-                WHERE aggregate_id = :id AND event_type = :eventType
+            SELECT 
+                payload,             
+                revision,             
+                event_type AS eventType,             
+                aggregate_id AS aggregateId,             
+                aggregate_type AS aggregateType
+            FROM outbox_event 
+            WHERE aggregate_id = :id AND event_type = :eventType;
         """.trimIndent()
 
         return@withHandleUnchecked handle

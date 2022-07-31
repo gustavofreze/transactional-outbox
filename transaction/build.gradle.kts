@@ -19,13 +19,22 @@ repositories {
 }
 
 dependencies {
-    implementation("com.lectra:koson:1.2.4")
     implementation("org.flywaydb:flyway-mysql")
-    implementation("org.jdbi:jdbi3-kotlin:3.32.0")
     implementation("org.flywaydb:flyway-core:9.0.2")
+
+    implementation("com.lectra:koson:1.2.4")
+    implementation("org.jdbi:jdbi3-kotlin:3.32.0")
     implementation("org.apache.kafka:kafka-streams:7.2.1-ccs")
+
+    implementation("io.confluent:kafka-json-serializer:7.2.1")
     implementation("io.confluent:kafka-streams-avro-serde:7.2.1")
+    implementation("io.confluent:kafka-json-schema-serializer:7.2.1")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.3")
+
+    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
+    implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
 
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-kotlin")

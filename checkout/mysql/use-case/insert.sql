@@ -11,4 +11,4 @@ SET @payload := JSON_OBJECT('id', @id,
                             'country', JSON_OBJECT('alpha2', @country));
 
 INSERT INTO checkout_adm.outbox_event(id, aggregate_type, aggregate_id, event_type, revision, payload, occurred_on)
-VALUES (UUID_TO_BIN(UUID()), 'Checkout', @id, 'CheckoutDone', 1, @payload, NOW());
+VALUES (UUID(), 'Checkout', @id, 'CheckoutDone', 1, @payload, NOW());

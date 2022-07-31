@@ -1,4 +1,4 @@
-.PHONY: configure fix-style check-style
+.PHONY: fix-style check-style
 
 fix-style:
 	@./gradlew ktlintFormat
