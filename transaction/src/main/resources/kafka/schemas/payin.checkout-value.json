@@ -1,0 +1,38 @@
+[
+  {
+    "title": "CheckoutDone",
+    "description": "CheckoutDone schema.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "UUID que identifica o evento no formato canônico (separado por hífen na forma 8-4-4-4-12)."
+      },
+      "aggregateType": {
+        "type": "string",
+        "description": "Nome da raiz de agregação que produziu o evento no formato CamelCase."
+      },
+      "aggregateId": {
+        "type": "string",
+        "description": "Representação textual do identificador da raiz de agregação."
+      },
+      "eventType": {
+        "type": "string",
+        "description": "Nome do evento no formato CamelCase."
+      },
+      "revision": {
+        "type": "string",
+        "description": "Número positivo que indica a versão do payload produzido do evento."
+      },
+      "payload": {
+        "type": "string",
+        "description": "Payload do evento como um objeto json."
+      },
+      "occurredOn": {
+        "type": "string",
+        "description": "Momento em que o evento ocorreu."
+      }
+    }
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "name": "source-transaction-adm-events",
+  "config": {
+    "connector.class": "MySqlConnector",
+
+    "database.port": 3306,
+    "database.user": "root",
+    "database.hostname": "transaction-adm",
+    "database.password": "root",
+    "database.allowPublicKeyRetrieval": true,
+
+    "table.include.list": "transaction_adm.outbox_event",
+    "column.include.list": "transaction_adm.outbox_event.id, transaction_adm.outbox_event.aggregate_type, transaction_adm.outbox_event.aggregate_id, transaction_adm.outbox_event.event_type, transaction_adm.outbox_event.revision, transaction_adm.outbox_event.payload, transaction_adm.outbox_event.occurred_on",
+    "database.include.list": "transaction_adm",
+
+    "database.history.kafka.topic": "payin.transaction-adm.outbox-event.history",
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.store.only.captured.tables.ddl": true,
+
+    "snapshot.mode": "when_needed",
+    "skipped.operations": "u,d",
+    "message.key.columns": "transaction_adm.outbox_event:id",
+    "database.server.name": "payin.transaction",
+    "snapshot.locking.mode": "none",
+    "include.schema.changes": false,
+
+    "transforms": "unwrap, renameFields, Reroute, SetSchemaMetadata",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": true,
+    "transforms.renameFields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.renameFields.renames": "event_type:eventType, aggregate_type:aggregateType, aggregate_id:aggregateId, occurred_on:occurredOn",
+    "transforms.Reroute.type": "io.debezium.transforms.ByLogicalTableRouter",
+    "transforms.Reroute.topic.regex": "(.*)outbox_event(.*)",
+    "transforms.Reroute.topic.replacement": "payin.transaction",
+    "transforms.SetSchemaMetadata.type": "org.apache.kafka.connect.transforms.SetSchemaMetadata$Value",
+    "transforms.SetSchemaMetadata.schema.name": "TransactionRequested",
+    "transforms.SetSchemaMetadata.schema.version": 1,
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": false,
+    "key.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter.schema.registry.url": "http://schema-registry:8081"
+  }
+}
