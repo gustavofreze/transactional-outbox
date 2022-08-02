@@ -17,7 +17,8 @@
 
 Este projeto é uma POC para apresentar na prática uma forma de implementar o
 padrão [Transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html). Eu escrevi
-este [artigo](https://medium.com/@gustavo.freze/transactional-outbox-ea8294070f28), explicando o que é o padrão, quando e o porque usá-lo.
+este [artigo](https://medium.com/@gustavo.freze/transactional-outbox-ea8294070f28), explicando o que é o padrão, quando
+e o porque usá-lo.
 
 ### Implementação
 
@@ -57,7 +58,7 @@ se apoia em 3 passos.
 Para clonar o repositório usando a linha de comando, execute:
 
 ```bash
-https://github.com/gustavofreze/transactional-outbox.git
+git clone https://github.com/gustavofreze/transactional-outbox.git
 ```
 
 <div id='configure'></div> 
