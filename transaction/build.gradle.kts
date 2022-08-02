@@ -79,6 +79,7 @@ pitest {
 tasks.test { useJUnitPlatform() }
 tasks.check { dependsOn(tasks.pitest) }
 tasks.pitest { dependsOn(tasks.test) }
+
 tasks.runKtlintCheckOverMainSourceSet { dependsOn(tasks.quarkusGenerateCode) }
 tasks.runKtlintCheckOverTestSourceSet { dependsOn(tasks.quarkusGenerateCodeTests) }
 

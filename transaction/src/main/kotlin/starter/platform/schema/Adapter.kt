@@ -10,6 +10,7 @@ import starter.Environment.get
 import starter.platform.schema.dtos.Subject
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.stream.Stream
 import javax.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
@@ -31,11 +32,10 @@ class Adapter(settings: Settings) : Schema {
             }
     }
 
-    private fun subjects(): List<Subject> = Files
+    private fun subjects(): Stream<Subject> = Files
         .walk(Paths.get(path))
         .filter { Files.isRegularFile(it) }
         .map { it.toFile() }
         .filter { it.name.endsWith(".json") }
         .map { Subject(name = it.name.removeSuffix(".json"), schema = it.readText()) }
-        .toList()
 }

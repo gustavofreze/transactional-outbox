@@ -13,7 +13,7 @@ printf mysql >null
 printf "\n"
 
 mysql --defaults-extra-file="${CREDENTIALS}" <<EOF
-SELECT aggregate_id, event_type, occurred_on FROM checkout_adm.outbox_event ORDER BY 1 DESC LIMIT 1;
+SELECT aggregate_id, event_type FROM checkout_adm.outbox_event ORDER BY 1 DESC LIMIT 1;
 EOF
 
 printf mysql >null

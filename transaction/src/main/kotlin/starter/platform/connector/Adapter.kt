@@ -11,6 +11,7 @@ import starter.Environment.get
 import starter.platform.connector.dtos.ConnectorData
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.stream.Stream
 import javax.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
@@ -83,13 +84,12 @@ class Adapter : Connector {
         }
     }
 
-    private fun listFromClasspath(): List<ConnectorData> {
+    private fun listFromClasspath(): Stream<ConnectorData> {
         return Files
             .walk(Paths.get(path))
             .filter { Files.isRegularFile(it) }
             .map { it.toFile() }
             .filter { it.name.endsWith(".json") }
             .map { ConnectorData(name = it.name.removeSuffix(".json"), data = it.readText()) }
-            .toList()
     }
 }
