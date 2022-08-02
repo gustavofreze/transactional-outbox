@@ -1,0 +1,49 @@
+[
+  {
+    "type": "record",
+    "name": "CheckoutDone",
+    "namespace": "payin.checkout",
+    "fields": [
+      {
+        "name": "id",
+        "type": "string",
+        "doc": "Identificador do checkout."
+      },
+      {
+        "name": "amount",
+        "type": {
+          "doc": "Valor monetário do checkout.",
+          "name": "Amount",
+          "type": "record",
+          "fields": [
+            {
+              "doc": "Valor do checkout.",
+              "name": "value",
+              "type": "string"
+            },
+            {
+              "doc": "Moeda do checkout no formato ISO-4217.",
+              "name": "currency",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      {
+        "name": "country",
+        "type": {
+          "doc": "País de checkout.",
+          "name": "Country",
+          "type": "record",
+          "fields": [
+            {
+              "doc": "País do checkout no formato ISO 3166-1-alpha-2.",
+              "name": "alpha2",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

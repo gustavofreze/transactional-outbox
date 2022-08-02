@@ -1,0 +1,29 @@
+quarkus:
+  log:
+    console:
+      level: INFO
+      format: '%d{yyyy-MM-dd''T''HH:mm:ss} component=transaction type=%p message="%s" class=%C thread="%t" exception="%e"%n'
+  test:
+    continuous-testing: disabled
+  http:
+    port: 8084
+    host: 0.0.0.0
+    test-port: 0
+  flyway:
+    migrations:
+      schemas: ${FLYWAY_SCHEMA}
+      locations: db/mysql/migration
+      create-schemas: true
+      migrate-at-start: true
+  datasource:
+    db-kind: mysql
+    username: ${USERNAME}
+    password: ${PASSWORD}
+    jdbc:
+      url: ${JDBC_URL}
+    migrations:
+      db-kind: mysql
+      username: ${FLYWAY_USERNAME}
+      password: ${FLYWAY_PASSWORD}
+      jdbc:
+        url: ${FLYWAY_JDBC_URL}
