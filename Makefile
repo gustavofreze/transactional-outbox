@@ -23,7 +23,7 @@ clean: stop
 clean-all: clean
 	@${DOCKER_IMAGE_PRUNE} --filter label="io.confluent.docker=true"
 	@${DOCKER_IMAGE_PRUNE} --filter label="maintainer"="Debezium Community"
-	@${DOCKER_IMAGE_PRUNE} --filter label="org.label-schema.name"="gustavofreze/gradle:7.4.2"
+	@${DOCKER_IMAGE_PRUNE} --filter label="com.docker.compose.project"="transactional-outbox"
 
 change-ownership:
 	@sudo chown -R ${USER}:${USER} ${PWD}

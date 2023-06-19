@@ -1,4 +1,4 @@
-FROM gustavofreze/gradle:7.4.2
+FROM gradle:7.4.2-jdk18
 
 WORKDIR /opt/application
 
