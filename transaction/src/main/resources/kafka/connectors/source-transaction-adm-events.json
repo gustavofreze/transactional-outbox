@@ -14,7 +14,7 @@
     "database.include.list": "transaction_adm",
 
     "database.history.kafka.topic": "payin.transaction-adm.outbox-event.history",
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.bootstrap.servers": "broker:9000",
     "database.history.store.only.captured.tables.ddl": true,
 
     "snapshot.mode": "when_needed",
